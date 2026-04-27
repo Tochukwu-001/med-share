@@ -1,9 +1,14 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { LuUserRound } from "react-icons/lu";
 import { RiMenu3Fill } from "react-icons/ri";
+import { IoMdClose } from "react-icons/io";
 
 export default function Navbar() {
+  const [navOpen, setNavOpen] = useState(false);
+
   const navLinks = [
     {
       label: "Home",
@@ -56,7 +61,9 @@ export default function Navbar() {
       </div>
 
       {/*mobile navbar*/}
-      <div className="md:hidden bg-white h-dvh w-full absolute top-0 left-0 flex flex-col items-center gap-10 pt-20">
+      <div
+        className={`md:hidden bg-white h-dvh w-full absolute top-0 left-0 ${navOpen ? "flex" : "hidden"} flex-col items-center gap-10 pt-20`}
+      >
         {navLinks.map((item, i) => (
           <Link
             key={i}
@@ -72,8 +79,11 @@ export default function Navbar() {
           Sign in <LuUserRound className="text-2xl" />{" "}
         </Link>
       </div>
-      <button className="md:hidden z-50 text-2xl">
-        <RiMenu3Fill />
+      <button
+        onClick={() => setNavOpen(!navOpen)}
+        className="md:hidden z-50 text-2xl"
+      >
+        {navOpen ? <IoMdClose /> : <RiMenu3Fill />}
       </button>
 
       <Link className="max-md:hidden " href={"/signin"}>
