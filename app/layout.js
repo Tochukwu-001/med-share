@@ -1,6 +1,7 @@
 import { Playfair } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 const playFair = Playfair({
   weight: ["300", "400", "500", "600", "700", "800", "900"],
@@ -21,6 +22,7 @@ export default function RootLayout({ children }) {
       <body className="min-h-full flex flex-col">
         <Navbar/>
         {children}
+        <Footer/>
       </body>
     </html>
   );

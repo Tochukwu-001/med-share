@@ -55,7 +55,7 @@ export default function Navbar() {
             </div>
 
             {/* mobile navbar */}
-            <div className="md:hidden bg-white h-dvh w-full absolute top-0 left-0 flex flex-col items-center gap-10 pt-20">
+            <div className={`md:hidden bg-white h-dvh w-full absolute top-0 left-0 ${navOpen ? "flex" : "hidden"} flex-col items-center gap-10 pt-20`}>
                 {
                     navLinks.map((item, i) => (
                         <Link key={i} className="text-lg hover:bg-[#67C090] py-1 px-2 border-b-6 border-white hover:border-[#468432] transition-all duration-200" href={item.url}>{item.label}</Link>
@@ -67,9 +67,12 @@ export default function Navbar() {
                 </Link>
             </div>
 
-            <button className="md:hidden z-50 text-2xl">
-                <RiMenu3Fill />
-                <IoMdClose />
+            <button onClick={() => setNavOpen(!navOpen)} className="md:hidden z-50 text-2xl">
+                {
+                    navOpen ?
+                        <IoMdClose /> :
+                        <RiMenu3Fill />
+                }
             </button>
 
             <Link className="max-md:hidden" href={"/signin"}><LuUserRound className="text-2xl" /></Link>
