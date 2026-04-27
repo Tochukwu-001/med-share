@@ -1,9 +1,14 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { LuUserRound } from "react-icons/lu";
 import { RiMenu3Fill } from "react-icons/ri";
+import { IoMdClose } from "react-icons/io";
 
 export default function Navbar() {
+
+    const [navOpen, setNavOpen] = useState(false)
 
     const navLinks = [
         {
@@ -62,7 +67,10 @@ export default function Navbar() {
                 </Link>
             </div>
 
-            <button className="md:hidden z-50 text-2xl"><RiMenu3Fill /></button>
+            <button className="md:hidden z-50 text-2xl">
+                <RiMenu3Fill />
+                <IoMdClose />
+            </button>
 
             <Link className="max-md:hidden" href={"/signin"}><LuUserRound className="text-2xl" /></Link>
 
