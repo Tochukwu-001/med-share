@@ -1,10 +1,10 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 import { LuUserRound } from "react-icons/lu";
 import { RiMenu3Fill } from "react-icons/ri";
 import { IoMdClose } from "react-icons/io";
+import { useState } from "react";
 
 export default function Navbar() {
   const [navOpen, setNavOpen] = useState(false);
@@ -62,7 +62,8 @@ export default function Navbar() {
 
       {/*mobile navbar*/}
       <div
-        className={`md:hidden bg-white h-dvh w-full absolute top-0 left-0 ${navOpen ? "flex" : "hidden"} flex-col items-center gap-10 pt-20`}
+        className={`md:hidden bg-white h-dvh w-full absolute top-0 left-0 ${navOpen ? "flex" : "hidden"}
+         flex-col items-center gap-10 pt-20`}
       >
         {navLinks.map((item, i) => (
           <Link
@@ -79,6 +80,7 @@ export default function Navbar() {
           Sign in <LuUserRound className="text-2xl" />{" "}
         </Link>
       </div>
+
       <button
         onClick={() => setNavOpen(!navOpen)}
         className="md:hidden z-50 text-2xl"
