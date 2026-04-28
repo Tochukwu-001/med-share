@@ -3,14 +3,13 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-
 const playFair = Playfair({
   weight: ["300", "400", "500", "600", "700", "800", "900"],
-  subsets: ["latin"],
-});
+  subsets: ["latin"]
+})
 
 export const metadata = {
-  title: "Med-Share Africa | Connect with healt",
+  title: "MedShare Africa | connect with health",
   description: "A platform for sharing medical resources",
 };
 
@@ -21,10 +20,10 @@ export default function RootLayout({ children }) {
       className={`${playFair.className} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Navbar />
+        <Navbar/>
         {children}
         <Footer/>
-        </body>
+      </body>
     </html>
   );
 }
