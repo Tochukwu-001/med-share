@@ -1,3 +1,4 @@
+import { signIn } from "@/auth";
 import { Theme } from "@/components/Theme";
 import Link from "next/link";
 import React from 'react';
@@ -6,7 +7,7 @@ const SignInPage = () => {
   return (
     <main className="min-h-dvh bg-slate-50 flex items-center justify-center p-6">
       <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
-        
+
         {/* Header / Branding */}
         <div className="pt-10 pb-6 px-8 text-center">
           <h1 className="text-3xl font-black mb-2">
@@ -41,6 +42,15 @@ const SignInPage = () => {
             Continue with Google
           </button>
 
+          <form
+            action={async () => {
+              "use server"
+              await signIn("google")
+            }}
+          >
+            <button type="submit">Signin with Google</button>
+          </form>
+
           <div className="relative mb-8 text-center">
             <hr className="border-slate-200" />
             <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-4 text-xs text-slate-400 uppercase tracking-widest">
@@ -52,8 +62,8 @@ const SignInPage = () => {
           <form className="flex flex-col gap-5">
             <div>
               <label className="block text-sm font-semibold mb-2 text-slate-700">Email Address</label>
-              <input 
-                type="email" 
+              <input
+                type="email"
                 placeholder="name@example.com"
                 className="w-full px-5 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 bg-slate-50"
                 style={{ '--tw-ring-color': Theme.primaryGreen }}
@@ -67,15 +77,15 @@ const SignInPage = () => {
                   Forgot?
                 </Link>
               </div>
-              <input 
-                type="password" 
+              <input
+                type="password"
                 placeholder="••••••••"
                 className="w-full px-5 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 bg-slate-50"
                 style={{ '--tw-ring-color': Theme.primaryGreen }}
               />
             </div>
 
-            <button 
+            <button
               type="submit"
               className="w-full py-4 rounded-full text-white font-bold text-lg mt-2 transition-transform active:scale-95 shadow-lg"
               style={{ backgroundColor: Theme.primaryGreen }}
