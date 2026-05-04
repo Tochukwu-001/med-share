@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-<<<<<<< HEAD
 import { LuUserRound } from "react-icons/lu";
 import { RiMenu3Fill } from "react-icons/ri";
 import { IoMdClose } from "react-icons/io";
@@ -94,7 +93,6 @@ export default function Navbar() {
       </Link>
     </main>
   );
-=======
 import { useState } from "react";
 import { LuUserRound } from "react-icons/lu";
 import { RiMenu3Fill } from "react-icons/ri";
@@ -173,5 +171,4 @@ export default function Navbar() {
 
         </main>
     )
->>>>>>> a3b43a4f55cdb78bd1d9ebf2eec467f8a2f1c80b
 }
