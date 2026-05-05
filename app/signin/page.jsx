@@ -1,9 +1,18 @@
-import { signIn } from "@/auth";
+import { auth, signIn } from "@/auth";
 import { Theme } from "@/components/Theme";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import React from 'react';
 
-const SignInPage = () => {
+const SignInPage = async () => {
+  const session = await auth()
+  // console.log(session);
+
+  // redirect
+  if (session) {
+    redirect("/tips")
+  }
+  
   return (
     <main className="min-h-dvh bg-slate-50 flex items-center justify-center p-6">
       <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
