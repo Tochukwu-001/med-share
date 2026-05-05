@@ -119,9 +119,7 @@ export default function Home() {
               >
                 <div className="h-48 bg-slate-200 relative">
                   {/* Placeholder for Resource Image */}
-                  <div className="bg-[url('/bg1.jpg')] bg-center bg-no-repeat bg-cover absolute inset-0 flex items-center justify-center text-slate-400">
-                    Resource Image
-                  </div>
+                  <div className="bg-[url('/bg1.jpg')] bg-center bg-no-repeat bg-cover absolute inset-0 flex items-center justify-center text-slate-400"></div>
                 </div>
                 <div className="p-6">
                   <span
