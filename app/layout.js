@@ -2,6 +2,7 @@
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Provider from "@/components/Provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,10 +31,11 @@ export default function RootLayout({ children }) {
       className={`${playfair.className}  h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <Provider>
       <Navbar/> 
        {children}
       <Footer/>
-       
+       </Provider>
         </body>
     </html>
   );

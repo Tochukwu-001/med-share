@@ -2,10 +2,19 @@ import React from "react";
 import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
 import { Theme } from "@/components/Theme";
-import { signIn } from "@/auth";
+import { auth, signIn } from "@/auth";
+import { redirect } from "next/navigation";
 
 
-const page = () => {
+const page = async () => {
+  const session = await auth()
+  // console.log(session);
+
+  // redirect
+  if (session) {
+    redirect("/tips")
+  }
+  
   return (
     <main className="min-h-dvh flex items-center justify-center bg-[#f7f9f8] px-4">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-sm border">
