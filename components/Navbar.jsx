@@ -1,51 +1,46 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 import { LuUserRound } from "react-icons/lu";
 import { RiMenu3Fill } from "react-icons/ri";
 import { IoMdClose } from "react-icons/io";
-import { useSession } from "next-auth/react";
+import { useState } from "react";
+import { useSession, signOut } from "next-auth/react";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
 export default function Navbar() {
   const { data: session } = useSession();
-  // console.log(session);
-
   const [navOpen, setNavOpen] = useState(false);
 
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const open = Boolean(anchorEl);
+
   const navLinks = [
-    {
-      label: "Home",
-      url: "/",
-    },
-    {
-      label: "Health Tips",
-      url: "/tips",
-    },
-    {
-      label: "Upload Tip",
-      url: "/upload",
-    },
-    {
-      label: "Contact Us",
-      url: "/contact",
-    },
+    { label: "Home", url: "/" },
+    { label: "Health Tips", url: "/tips" },
+    { label: "Upload Tip", url: "/upload" },
+    { label: "Contact Us", url: "/contact" },
   ];
 
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
 
+  // This function triggers the reactive logout
+  const handleLogout = async () => {
+    handleClose();
+    await signOut({ callbackUrl: "/" });
+  };
+
   return (
-    <main className="flex items-center justify-between px-6 py-3 shadow-md bg-white sticky top-0 z-50">
-      <Link href={"/"} className="flex items-center gap-1 z-50">
+    <main className="flex items-center justify-between px-6 py-3 shadow-md bg-white sticky top-0">
+      <Link href={"/"} className=" flex items-center gap-1 z-50">
         <Image
           src={"/logo.png"}
           alt="logo"
@@ -59,7 +54,7 @@ export default function Navbar() {
         </span>
       </Link>
 
-      {/* desktop and tab navbar */}
+      {/* Desktop and Tab Navbar */}
       <div className="flex items-center gap-8 max-md:hidden">
         {navLinks.map((item, i) => (
           <Link
@@ -72,23 +67,27 @@ export default function Navbar() {
         ))}
       </div>
 
-      {/* mobile navbar */}
+      {/* Mobile Navbar */}
       <div
-        className={`md:hidden bg-white h-dvh w-full absolute top-0 left-0 ${navOpen ? "flex" : "hidden"} flex-col items-center gap-10 pt-20`}
+        className={`md:hidden bg-white h-dvh w-full absolute top-0 left-0 ${navOpen ? "flex" : "hidden"}
+         flex-col items-center gap-10 pt-20`}
       >
         {navLinks.map((item, i) => (
           <Link
             key={i}
+            onClick={() => setNavOpen(false)}
             className="text-lg hover:bg-[#67C090] py-1 px-2 border-b-6 border-white hover:border-[#468432] transition-all duration-200"
             href={item.url}
           >
             {item.label}
           </Link>
         ))}
-        <Link href={"/signin"} className="flex items-center gap-2 text-lg">
-          Sign in
-          <LuUserRound className="text-xl" />
-        </Link>
+
+        {!session && (
+          <Link href={"/signin"} className="flex items-center gap-2 text-lg">
+            Sign in <LuUserRound className="text-2xl" />
+          </Link>
+        )}
       </div>
 
       <button
@@ -106,10 +105,12 @@ export default function Navbar() {
             aria-haspopup="true"
             aria-expanded={open ? "true" : undefined}
             onClick={handleClick}
+            className="flex items-center"
           >
             <img
               src={session?.user?.image}
-              alt={session?.user?.name.slice(0, 2)}
+              alt={session?.user?.name?.slice(0, 2)}
+              className="w-10 h-10 rounded-full border border-gray-200 object-cover"
             />
           </button>
           <Menu
@@ -124,13 +125,13 @@ export default function Navbar() {
             }}
           >
             <MenuItem onClick={handleClose}>
-              <Link href={"/account"}>My Profile</Link>
+              <Link href={"/account"}>My profile</Link>
             </MenuItem>
             <MenuItem onClick={handleClose}>
-              <Link href={"/upload"}>Upload Tip</Link>
+              <Link href={"/tips"}>Upload Tip</Link>
             </MenuItem>
-            <MenuItem onClick={handleClose}>
-              <button className="bg-red-500 w-full text-red-100 m-0 py-1 rounded-md">
+            <MenuItem onClick={handleLogout}>
+              <button className="bg-red-500 w-full text-white m-0 py-1 px-4 rounded-md">
                 Logout
               </button>
             </MenuItem>
