@@ -5,7 +5,7 @@ import { useState } from "react";
 import { LuUserRound } from "react-icons/lu";
 import { RiMenu3Fill } from "react-icons/ri";
 import { IoMdClose } from "react-icons/io";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
@@ -100,8 +100,9 @@ export default function Navbar() {
                             aria-haspopup="true"
                             aria-expanded={open ? 'true' : undefined}
                             onClick={handleClick}
+                            className="w-8 h-8 rounded-full overflow-hidden"
                         >
-                            <img src={session?.user?.image} alt={session?.user?.name.slice(0,2)} />
+                            <img src={session?.user?.image} alt={session?.user?.name.slice(0,2)} className="" />
                         </button>
                         <Menu
                             id="basic-menu"
@@ -116,7 +117,7 @@ export default function Navbar() {
                         >
                             <MenuItem onClick={handleClose}><Link href={"/account"}>My Profile</Link></MenuItem>
                             <MenuItem onClick={handleClose}><Link href={"/upload"}>Upload Tip</Link></MenuItem>
-                            <MenuItem onClick={handleClose}><button className="bg-red-500 w-full text-red-100 m-0 py-1 rounded-md">Logout</button></MenuItem>
+                            <MenuItem onClick={handleClose}><button onClick={()=> signOut()} className="bg-red-500 w-full text-red-100 m-0 py-1 rounded-md">Logout</button></MenuItem>
                         </Menu>
                     </div>
                 ) : (
