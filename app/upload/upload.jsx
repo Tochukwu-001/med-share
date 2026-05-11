@@ -4,8 +4,11 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { FaRegPaperPlane } from "react-icons/fa";
 import { Theme } from "@/components/Theme";
 import * as Yup from 'yup';
+import { collection, addDoc } from "firebase/firestore"; 
+import { db } from '@/config/firebase';
 
-export default function UploadClient() {
+
+export default function UploadClient({session}) {
     const iv = {
         tip: "",
         desc: "",
@@ -19,7 +22,7 @@ export default function UploadClient() {
     });
 
     return (
-        <main className="min-h-dvh bg-slate-50 py-12 px-6">
+        <main className="min-h-dvh py-12 px-6">
             <div className="max-w-2xl mx-auto">
                 {/* Header Text */}
                 <div className="mb-10 text-center">
@@ -36,9 +39,23 @@ export default function UploadClient() {
                     <Formik
                         initialValues={iv}
                         validationSchema={valSchema}
-                        onSubmit={(values) => {
-                            console.log("Form Data:", values);
-                            alert("Tip submitted successfully!");
+                        onSubmit={ async (values) => {
+                            try {      
+                                const dbObject = {
+                                    ...values,
+                                    author: session?.user?.name,
+                                    authorImg: session?.user?.image,
+                                    refId: session?.user?.id,
+                                    timestamp: new Date().toLocaleDateString()
+                                }  
+
+                                const docRef = await addDoc(collection(db, "health-tips"), dbObject)
+                                
+                                console.log(dbObject);                            
+                            } catch (error) {
+                                console.error("An error occurred", error)
+                                alert("SOmething went wrong")
+                            }
                         }}
                     >
                         {({ errors, touched }) => (
