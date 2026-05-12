@@ -8,11 +8,11 @@ import { redirect } from "next/navigation";
 
 const page = async () => {
   const session = await auth()
-  // console.log(session);
+  console.log(session);
 
   // redirect
   if (session) {
-    redirect("/tips")
+    redirect("/")
   }
   
   return (

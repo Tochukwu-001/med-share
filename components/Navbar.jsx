@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import Avatar from '@mui/material/Avatar';
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -104,13 +105,9 @@ export default function Navbar() {
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
             onClick={handleClick}
-            className="flex items-center"
+
           >
-            <img 
-              src={session?.user?.image} 
-              alt={session?.user?.name?.slice(0, 2)} 
-              className="w-10 h-10 rounded-full border border-gray-200 object-cover"
-            />
+            <Avatar alt={session?.user?.name} src={session?.user?.image} />
           </button>
           <Menu
             id="basic-menu"

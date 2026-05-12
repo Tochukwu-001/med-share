@@ -1,11 +1,34 @@
 "use client";
-import React from 'react';
+import React, { useState } from 'react';
 import { Field, Formik, Form, ErrorMessage } from 'formik';
 import { FaRegPaperPlane } from "react-icons/fa";
 import { Theme } from "@/components/Theme";
 import * as Yup from 'yup';
+import { collection, addDoc } from "firebase/firestore"; 
+import { db } from '@/config/firebase';
+import { FiLoader } from "react-icons/fi";
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
+import { FaThumbsUp } from "react-icons/fa";
 
-export default function UploadClient() {
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  boxShadow: 24,
+  p: 4,
+};
+
+export default function UploadClient({session}) {
+  const [processing, setProcessing] = useState(false)
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  
   const iv = {
     tip: "",
     desc: "",
@@ -36,7 +59,28 @@ export default function UploadClient() {
           <Formik
             initialValues={iv}
             validationSchema={valSchema}
-            onSubmit={(values) => console.log(values)}
+            onSubmit={ async (values, {resetForm}) => {
+              try {
+                setProcessing(true)
+              const dbobject = {
+              ...values,
+              author: session?.user?.name,
+              authorImg: session?.user?.image,
+              refId: session?.user?.id,
+              timestamp: new Date().toLocaleDateString()
+              }
+
+              const docRef = await addDoc(collection(db, "health-tips"), dbobject)
+              resetForm()
+              handleOpen()
+              // console.log(dbobject);
+            } catch (error) {
+              console.error("An error occurred", error)
+              alert("Something went wrong")
+            } finally{
+              setProcessing(false)
+            }
+            }}
           >
             <Form className="space-y-6">
               {/* Health Tip Field */}
@@ -83,17 +127,44 @@ export default function UploadClient() {
               {/* Submit Button */}
               <div className="pt-4">
                 <button
+                disabled={processing}
                   type="submit"
                   style={{ backgroundColor: Theme.secondaryGreen }}
                   className="w-full flex items-center justify-center gap-3 py-4 rounded-full text-white font-black uppercase tracking-widest text-sm transition-all hover:shadow-lg hover:-translate-y-1 active:scale-95"
                 >
-                  Post <FaRegPaperPlane className="text-lg" />
+                  {
+                    processing ? <FiLoader className='text-2xl animate-spin' /> :
+                     <span className='flex items-center gap-2'>
+                  Post Tip
+                  <FaRegPaperPlane className="text-lg" />
+                  </span>
+                  }
+                 
                 </button>
               </div>
             </Form>
           </Formik>
         </div>
       </div>
+      {/* confirmation modal */}
+      <div>
+      {/* <Button onClick={handleOpen}>Open modal</Button> */}
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-modal-title" variant="h6" component="h2" className='flex items-center justify-center'>
+            <FaThumbsUp className='text-6xl text-green-600' />
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }} className='text-center'>
+           Health tip was sucessfully submitted
+          </Typography>
+        </Box>
+      </Modal>
+    </div>
     </main>
   );
 }

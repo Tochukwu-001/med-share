@@ -10,7 +10,7 @@ export default async function Upload () {
     }
     return (
         <main>
-            <UploadClient/>
+            <UploadClient session={session} />
         </main>
     )
 }
