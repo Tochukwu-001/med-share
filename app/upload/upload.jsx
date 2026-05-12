@@ -1,14 +1,17 @@
 "use client";
-import React from 'react';
+import React, { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { FaRegPaperPlane } from "react-icons/fa";
 import { Theme } from "@/components/Theme";
 import * as Yup from 'yup';
-import { collection, addDoc } from "firebase/firestore"; 
+import { collection, addDoc } from "firebase/firestore";
 import { db } from '@/config/firebase';
+import { FiLoader } from "react-icons/fi";
 
 
-export default function UploadClient({session}) {
+export default function UploadClient({ session }) {
+    const [processing, setProcessing] = useState(false)
+
     const iv = {
         tip: "",
         desc: "",
@@ -39,22 +42,25 @@ export default function UploadClient({session}) {
                     <Formik
                         initialValues={iv}
                         validationSchema={valSchema}
-                        onSubmit={ async (values) => {
-                            try {      
+                        onSubmit={async (values, { resetForm }) => {
+                            try {
+                                setProcessing(true)
                                 const dbObject = {
                                     ...values,
                                     author: session?.user?.name,
                                     authorImg: session?.user?.image,
                                     refId: session?.user?.id,
                                     timestamp: new Date().toLocaleDateString()
-                                }  
+                                }
 
                                 const docRef = await addDoc(collection(db, "health-tips"), dbObject)
-                                
-                                console.log(dbObject);                            
+                                resetForm()
+                                // console.log(dbObject);       
                             } catch (error) {
                                 console.error("An error occurred", error)
                                 alert("SOmething went wrong")
+                            } finally{
+                                setProcessing(false)
                             }
                         }}
                     >
@@ -63,23 +69,22 @@ export default function UploadClient({session}) {
                                 {/* Tip Title */}
                                 <div className="flex flex-col gap-2">
                                     <label className="text-sm font-bold text-slate-700 ml-1">Health Tip Title</label>
-                                    <Field 
-                                        name="tip" 
+                                    <Field
+                                        name="tip"
                                         placeholder="e.g. Importance of Vitamin D"
-                                        className={`w-full px-5 py-4 rounded-2xl border transition-all focus:outline-none focus:ring-2 bg-slate-50 ${
-                                            errors.tip && touched.tip ? 'border-red-400' : 'border-slate-200'
-                                        }`}
+                                        className={`w-full px-5 py-4 rounded-2xl border transition-all focus:outline-none focus:ring-2 bg-slate-50 ${errors.tip && touched.tip ? 'border-red-400' : 'border-slate-200'
+                                            }`}
                                         style={{ '--tw-ring-color': Theme.primaryGreen }}
                                     />
-                                    <ErrorMessage component="p" className="text-red-500 text-xs font-bold ml-1" name="tip"/>
+                                    <ErrorMessage component="p" className="text-red-500 text-xs font-bold ml-1" name="tip" />
                                 </div>
 
                                 {/* Category Select */}
                                 <div className="flex flex-col gap-2">
                                     <label className="text-sm font-bold text-slate-700 ml-1">Category</label>
                                     <div className="relative">
-                                        <Field 
-                                            name="cat" 
+                                        <Field
+                                            name="cat"
                                             as="select"
                                             className="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 bg-slate-50 appearance-none cursor-pointer"
                                             style={{ '--tw-ring-color': Theme.primaryGreen }}
@@ -95,44 +100,49 @@ export default function UploadClient({session}) {
                                             <option value="other">Other</option>
                                         </Field>
                                         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-slate-400">
-                                            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
                                         </div>
                                     </div>
-                                    <ErrorMessage component="p" className="text-red-500 text-xs font-bold ml-1" name="cat"/>
+                                    <ErrorMessage component="p" className="text-red-500 text-xs font-bold ml-1" name="cat" />
                                 </div>
 
                                 {/* Description Textarea */}
                                 <div className="flex flex-col gap-2">
                                     <label className="text-sm font-bold text-slate-700 ml-1">Content / Description</label>
-                                    <Field 
-                                        name="desc" 
-                                        as="textarea" 
+                                    <Field
+                                        name="desc"
+                                        as="textarea"
                                         rows="5"
                                         placeholder="Provide detailed health information here..."
-                                        className={`w-full px-5 py-4 rounded-2xl border transition-all focus:outline-none focus:ring-2 bg-slate-50 resize-none ${
-                                            errors.desc && touched.desc ? 'border-red-400' : 'border-slate-200'
-                                        }`}
+                                        className={`w-full px-5 py-4 rounded-2xl border transition-all focus:outline-none focus:ring-2 bg-slate-50 resize-none ${errors.desc && touched.desc ? 'border-red-400' : 'border-slate-200'
+                                            }`}
                                         style={{ '--tw-ring-color': Theme.primaryGreen }}
                                     />
-                                    <ErrorMessage component="p" className="text-red-500 text-xs font-bold ml-1" name="desc"/>
+                                    <ErrorMessage component="p" className="text-red-500 text-xs font-bold ml-1" name="desc" />
                                 </div>
 
                                 {/* Submit Button */}
-                                <button 
+                                <button
+                                    disabled={processing}
                                     type="submit"
                                     className="w-full md:w-max md:self-end flex items-center justify-center gap-3 py-4 px-10 rounded-full text-white font-black text-lg transition-transform active:scale-95 shadow-lg"
                                     style={{ backgroundColor: Theme.primaryGreen }}
                                 >
-                                    Post Tip <FaRegPaperPlane className="text-sm" />
+                                    {
+                                        processing ? <FiLoader className='text-2xl animate-spin' /> :
+                                            <span className='flex items-center gap-2'>
+                                                Post Tip <FaRegPaperPlane className="text-sm" />
+                                            </span>
+                                    }
                                 </button>
                             </Form>
                         )}
                     </Formik>
                 </div>
-                
+
                 {/* Back Link */}
                 <p className="text-center mt-10 text-slate-400 text-sm italic">
-                    All submissions are reviewed for community safety. 
+                    All submissions are reviewed for community safety.
                     <button className="ml-2 font-bold underline" style={{ color: Theme.secondaryGreen }}>Learn more</button>
                 </p>
             </div>
