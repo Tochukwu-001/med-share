@@ -7,10 +7,28 @@ import * as Yup from 'yup';
 import { collection, addDoc } from "firebase/firestore";
 import { db } from '@/config/firebase';
 import { FiLoader } from "react-icons/fi";
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
+import { FaRegThumbsUp } from "react-icons/fa";
+
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 4,
+};
 
 
 export default function UploadClient({ session }) {
     const [processing, setProcessing] = useState(false)
+    const [open, setOpen] = useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
 
     const iv = {
         tip: "",
@@ -55,11 +73,12 @@ export default function UploadClient({ session }) {
 
                                 const docRef = await addDoc(collection(db, "health-tips"), dbObject)
                                 resetForm()
+                                handleOpen()
                                 // console.log(dbObject);       
                             } catch (error) {
                                 console.error("An error occurred", error)
                                 alert("SOmething went wrong")
-                            } finally{
+                            } finally {
                                 setProcessing(false)
                             }
                         }}
@@ -145,6 +164,26 @@ export default function UploadClient({ session }) {
                     All submissions are reviewed for community safety.
                     <button className="ml-2 font-bold underline" style={{ color: Theme.secondaryGreen }}>Learn more</button>
                 </p>
+            </div>
+
+            {/* confirmation modal */}
+            <div>
+                {/* <button onClick={handleOpen}>Open modal</button> */}
+                <Modal
+                    open={open}
+                    onClose={handleClose}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                >
+                    <Box sx={style}>
+                        <Typography id="modal-modal-title" variant="h6" component="h2" className='flex items-center justify-center'>
+                            <FaRegThumbsUp className='text-6xl text-green-600' />
+                        </Typography>
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }} className='text-center'>
+                            Health Tip was sucessfully submitted
+                        </Typography>
+                    </Box>
+                </Modal>
             </div>
         </main>
     );
