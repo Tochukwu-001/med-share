@@ -5,12 +5,17 @@ import { useState } from "react";
 import { LuUserRound } from "react-icons/lu";
 import { RiMenu3Fill } from "react-icons/ri";
 import { IoMdClose } from "react-icons/io";
+import { useSession, signOut } from "next-auth/react";
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
 export default function Navbar() {
+    const { data: session } = useSession()
 
     const [navOpen, setNavOpen] = useState(false)
 
     const navLinks = [
+
         {
             label: "Home",
             url: "/"
@@ -28,6 +33,15 @@ export default function Navbar() {
             url: "/contact"
         },
     ]
+
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
 
     return (
         <main className="flex items-center justify-between px-6 py-3 shadow-md bg-white sticky top-0">
@@ -74,9 +88,39 @@ export default function Navbar() {
                         <RiMenu3Fill />
                 }
             </button>
+            {
+                session ? <div>
+                    <button
+                        id="basic-button"
+                        aria-controls={open ? 'basic-menu' : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={open ? 'true' : undefined}
+                        onClick={handleClick}
+                    >
+                        <img src={session?.user?.image}
+                            alt={session?.user?.name.slice(0,2)}
+                        />
+                    </button>
+                    <Menu
+                        id="basic-menu"
+                        anchorEl={anchorEl}
+                        open={open}
+                        onClose={handleClose}
+                        slotProps={{
+                            list: {
+                                'aria-labelledby': 'basic-button',
+                            },
+                        }}
+                    >
+                        <MenuItem onClick={handleClose}><Link href={"/account"}>My Profile</Link></MenuItem>
+                        <MenuItem onClick={handleClose}><Link href={"/upload"}>Upload Tip</Link></MenuItem>
+                        <MenuItem onClick={() => { handleClose(); signOut({ callbackUrl: "/" }); }}><button className="bg-red-500 w-full text-red-100 m-0 py-2 rounded-md">Logout</button></MenuItem>
+                    </Menu>
+                </div> : (
+                    <Link className="max-md:hidden" href={"/signin"}><LuUserRound className="text-2xl" /></Link>
 
-            <Link className="max-md:hidden" href={"/signin"}><LuUserRound className="text-2xl" /></Link>
-
+                )
+            }
         </main>
     )
 }

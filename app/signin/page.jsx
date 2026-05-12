@@ -1,8 +1,14 @@
 import React from 'react';
 import { Theme } from "@/components/Theme";
 import Link from "next/link";
+import { auth, signIn } from '@/auth';
+import { redirect } from 'next/navigation';
 
-const SignInPage = () => {
+const SignInPage = async () => {
+    const session = await auth()
+    //redirect
+    if (session) {redirect("/tips")}
+    
     return (
         <main className="min-h-dvh flex flex-col md:flex-row bg-white">
             {/* Left Side: Visual/Brand Section (Hidden on mobile or top on mobile) */}
@@ -26,7 +32,14 @@ const SignInPage = () => {
                     </div>
 
                     {/* Google Sign In Button */}
-                    <button className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors text-slate-700 font-medium">
+                    
+                    <form
+                        action={async () => {
+                            "use server"
+                            await signIn("google")
+                        }}
+                    >
+                        <button type="submit" className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors text-slate-700 font-medium">
                         <svg className="w-5 h-5" viewBox="0 0 24 24">
                             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
                             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
@@ -35,6 +48,8 @@ const SignInPage = () => {
                         </svg>
                         Continue with Google
                     </button>
+                       
+                    </form>
 
                     <div className="relative">
                         <div className="absolute inset-0 flex items-center">
@@ -49,8 +64,8 @@ const SignInPage = () => {
                     <form className="space-y-6">
                         <div>
                             <label className="block text-sm font-bold text-slate-700 mb-2">Email Address</label>
-                            <input 
-                                type="email" 
+                            <input
+                                type="email"
                                 placeholder="name@example.com"
                                 className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all"
                                 style={{ focusRingColor: Theme.primaryGreen }}
@@ -62,16 +77,16 @@ const SignInPage = () => {
                                 <label className="block text-sm font-bold text-slate-700">Password</label>
                                 <Link href="/" className="text-sm font-semibold" style={{ color: Theme.primaryGreen }}>Forgot password?</Link>
                             </div>
-                            <input 
-                                type="password" 
+                            <input
+                                type="password"
                                 placeholder="••••••••"
                                 className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all"
                                 style={{ focusRingColor: Theme.primaryGreen }}
                             />
                         </div>
 
-                        <button 
-                            type="submit" 
+                        <button
+                            type="submit"
                             style={{ backgroundColor: Theme.secondaryGreen }}
                             className="w-full py-3 rounded-xl text-white font-bold text-lg shadow-lg hover:opacity-90 transition-opacity"
                         >
