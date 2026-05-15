@@ -122,7 +122,7 @@ const HealthTipsPage = () => {
 import React, { useState } from 'react';
 import { Theme } from "@/components/Theme";
 import Link from "next/link";
-import { FiTrash2 } from "react-icons/fi"; // Importing React Icon
+import { FiTrash2 } from "react-icons/fi";
 
 const MedicalResources = () => {
   // Mock Array

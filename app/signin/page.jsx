@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 "use client";
 import React from 'react';
 import Link from 'next/link';
@@ -105,11 +106,23 @@ const SignInPage = () => {
     );
 =======
 import { signIn } from "@/auth";
+=======
+import { auth, signIn } from "@/auth";
+>>>>>>> 435087bf431decd73cff5608be8ff2e0472ec552
 import { Theme } from "@/components/Theme";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import React from 'react';
 
-const SignInPage = () => {
+const SignInPage = async () => {
+  const session = await auth()
+  // console.log(session);
+
+  // redirect
+  if (session) {
+    redirect("/tips")
+  }
+  
   return (
     <main className="min-h-dvh bg-slate-50 flex items-center justify-center p-6">
       <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
