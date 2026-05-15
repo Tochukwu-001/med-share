@@ -1,9 +1,11 @@
+"use server"
 import MedicalResources from "./tips";
 
-export default function Tips() {
+export default async function Tips() {
+  const session = await auth()
   return (
     <main>
-      <MedicalResources/>
+      <MedicalResources session={session}/>
     </main>
   )
 }
