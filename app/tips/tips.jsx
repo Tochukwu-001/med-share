@@ -3,10 +3,11 @@ import React, { useEffect, useState } from 'react';
 import { Theme } from "@/components/Theme";
 import Link from "next/link";
 import { FiTrash2 } from "react-icons/fi";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 import { db } from '@/config/firebase';
 
-const MedicalResources = () => {
+
+const MedicalResources = ({ session }) => {
 
     const [initialTips, setInitialTips] = useState([])
 
@@ -28,25 +29,30 @@ const MedicalResources = () => {
             });
             setInitialTips(ideas)
             // console.log(initialTips);
-            
+
         } catch (error) {
             console.error("An error occurred", error)
             alert("Something went wrong")
         }
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         handleFetch()
     }, [initialTips])
 
 
     // const [tips, setTips] = useState(initialTips);
     // console.log(tips);
-    
 
-    const handleDelete = (id) => {
-        if (confirm("Are you sure you want to delete this tip?")) {
-            setTips(tips.filter(tip => tip.id !== id));
+
+    const handleDelete = async (id) => {
+        try {
+            if (confirm("Are you sure you want to delete this tip?")) {
+                await deleteDoc(doc(db, "health-tips", id));
+            }
+        } catch (error) {
+            console.error("An error occurred", error)
+            alert("Oops, something went wrong!")
         }
     };
 
@@ -75,13 +81,16 @@ const MedicalResources = () => {
                             <div className="p-8 flex flex-col h-full relative">
 
                                 {/* Delete Button - Top Right */}
-                                <button
-                                    onClick={() => handleDelete(tip.id)}
-                                    className="absolute top-6 right-6 p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
-                                    title="Delete Tip"
-                                >
-                                    <FiTrash2 size={20} />
-                                </button>
+                                {
+                                    session?.user?.id == tip.refId ?
+                                        <button
+                                            onClick={() => handleDelete(tip.postId)}
+                                            className="absolute top-6 right-6 p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                                            title="Delete Tip"
+                                        >
+                                            <FiTrash2 size={20} />
+                                        </button> : null
+                                }
 
                                 {/* Category & Date */}
                                 <div className="flex items-center gap-3 mb-5">
