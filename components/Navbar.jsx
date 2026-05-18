@@ -5,17 +5,21 @@ import { useState } from "react";
 import { LuUserRound } from "react-icons/lu";
 import { RiMenu3Fill } from "react-icons/ri";
 import { IoMdClose } from "react-icons/io";
-import { useSession, signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import Avatar from '@mui/material/Avatar';
+
 
 export default function Navbar() {
+
     const { data: session } = useSession()
+    // console.log(session);
+
 
     const [navOpen, setNavOpen] = useState(false)
 
     const navLinks = [
-
         {
             label: "Home",
             url: "/"
@@ -44,7 +48,7 @@ export default function Navbar() {
     };
 
     return (
-        <main className="flex items-center justify-between px-6 py-3 shadow-md bg-white sticky top-0">
+        <main className="flex items-center justify-between px-6 py-3 shadow-md bg-white sticky top-0 z-50">
             <Link href={"/"} className="flex items-center gap-1 z-50">
                 <Image
                     src={"/logo.png"}
@@ -75,10 +79,39 @@ export default function Navbar() {
                         <Link key={i} className="text-lg hover:bg-[#67C090] py-1 px-2 border-b-6 border-white hover:border-[#468432] transition-all duration-200" href={item.url}>{item.label}</Link>
                     ))
                 }
-                <Link href={"/signin"} className="flex items-center gap-2 text-lg">
-                    Sign in
-                    <LuUserRound className="text-xl" />
-                </Link>
+                {
+                    session ? (
+                        <div>
+                            <button
+                                id="basic-button"
+                                aria-controls={open ? 'basic-menu' : undefined}
+                                aria-haspopup="true"
+                                aria-expanded={open ? 'true' : undefined}
+                                onClick={handleClick}
+                            >
+                                <Avatar alt={session?.user?.name} src={session?.user?.image} />
+                            </button>
+                            <Menu
+                                id="basic-menu"
+                                anchorEl={anchorEl}
+                                open={open}
+                                onClose={handleClose}
+                                slotProps={{
+                                    list: {
+                                        'aria-labelledby': 'basic-button',
+                                    },
+                                }}
+                            >
+                                <MenuItem onClick={handleClose}><Link href={"/profile"}>My Profile</Link></MenuItem>
+                                <MenuItem onClick={handleClose}><Link href={"/upload"}>Upload Tip</Link></MenuItem>
+                                <MenuItem onClick={handleClose}><button onClick={() => signOut()} className="bg-red-500 w-full text-red-100 m-0 py-1 rounded-md">Logout</button></MenuItem>
+                            </Menu>
+                        </div>
+                    ) : (
+                        <Link className="" href={"/signin"}><LuUserRound className="text-2xl" /></Link>
+                    )
+                }
+
             </div>
 
             <button onClick={() => setNavOpen(!navOpen)} className="md:hidden z-50 text-2xl">
@@ -88,39 +121,43 @@ export default function Navbar() {
                         <RiMenu3Fill />
                 }
             </button>
-            {
-                session ? <div>
-                    <button
-                        id="basic-button"
-                        aria-controls={open ? 'basic-menu' : undefined}
-                        aria-haspopup="true"
-                        aria-expanded={open ? 'true' : undefined}
-                        onClick={handleClick}
-                    >
-                        <img src={session?.user?.image}
-                            alt={session?.user?.name.slice(0,2)}
-                        />
-                    </button>
-                    <Menu
-                        id="basic-menu"
-                        anchorEl={anchorEl}
-                        open={open}
-                        onClose={handleClose}
-                        slotProps={{
-                            list: {
-                                'aria-labelledby': 'basic-button',
-                            },
-                        }}
-                    >
-                        <MenuItem onClick={handleClose}><Link href={"/account"}>My Profile</Link></MenuItem>
-                        <MenuItem onClick={handleClose}><Link href={"/upload"}>Upload Tip</Link></MenuItem>
-                        <MenuItem onClick={() => { handleClose(); signOut({ callbackUrl: "/" }); }}><button className="bg-red-500 w-full text-red-100 m-0 py-2 rounded-md">Logout</button></MenuItem>
-                    </Menu>
-                </div> : (
-                    <Link className="max-md:hidden" href={"/signin"}><LuUserRound className="text-2xl" /></Link>
 
+            <span className="max-md:hidden">
+
+            {
+                session ? (
+                    <div>
+                        <button
+                            id="basic-button"
+                            aria-controls={open ? 'basic-menu' : undefined}
+                            aria-haspopup="true"
+                            aria-expanded={open ? 'true' : undefined}
+                            onClick={handleClick}
+                        >
+                            <Avatar alt={session?.user?.name} src={session?.user?.image} />
+                        </button>
+                        <Menu
+                            id="basic-menu"
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={handleClose}
+                            slotProps={{
+                                list: {
+                                    'aria-labelledby': 'basic-button',
+                                },
+                            }}
+                        >
+                            <MenuItem onClick={handleClose}><Link href={"/profile"}>My Profile</Link></MenuItem>
+                            <MenuItem onClick={handleClose}><Link href={"/upload"}>Upload Tip</Link></MenuItem>
+                            <MenuItem onClick={handleClose}><button onClick={() => signOut()} className="bg-red-500 w-full text-red-100 m-0 py-1 rounded-md">Logout</button></MenuItem>
+                        </Menu>
+                    </div>
+                ) : (
+                    <Link className="" href={"/signin"}><LuUserRound className="text-2xl" /></Link>
                 )
             }
+            </span>
+
         </main>
     )
 }

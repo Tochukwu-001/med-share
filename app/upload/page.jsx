@@ -2,10 +2,9 @@ import { auth } from "@/auth";
 import UploadClient from "./upload";
 import { redirect } from "next/navigation";
 
-
-export default async function Upload() {
+export default async function Upload () {
     const session = await auth()
-    if (!session)   {
+    if (!session) {
         redirect("/signin")
     }
     return (
@@ -13,5 +12,4 @@ export default async function Upload() {
             <UploadClient session={session} />
         </main>
     )
-    return (
 }

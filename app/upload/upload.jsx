@@ -1,134 +1,190 @@
-"use client"
+"use client";
+import React, { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { FaRegPaperPlane, FaLeaf } from 'react-icons/fa';
-import { collection, addDoc } from "firebase/firestore"; 
+import { FaRegPaperPlane } from "react-icons/fa";
+import { Theme } from "@/components/Theme";
 import * as Yup from 'yup';
+import { collection, addDoc } from "firebase/firestore";
 import { db } from '@/config/firebase';
+import { FiLoader } from "react-icons/fi";
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
+import { FaRegThumbsUp } from "react-icons/fa";
 
-export default function UploadClient({ session }) { // Added curly braces for destructuring session
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 4,
+};
+
+
+export default function UploadClient({ session }) {
+    const [processing, setProcessing] = useState(false)
+    const [open, setOpen] = useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
+
 
     const iv = {
         tip: "",
-        description: "",
-        category: ""
-    }
+        desc: "",
+        cat: ""
+    };
 
-    const valSchema = Yup.object().shape({
+    const valSchema = Yup.object({
         tip: Yup.string().required("Health tip is required"),
-        description: Yup.string().required("Description is required"),
-        category: Yup.string().required("Category is required")
-    })
-
-    const inputClasses = "w-full px-4 py-3 mt-1 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#67C090] focus:border-[#67C090] outline-none transition-all duration-200 bg-white text-gray-700 placeholder:text-gray-400";
-    const labelClasses = "block text-sm font-bold text-[#468432] mb-1 ml-1";
+        desc: Yup.string().required("Provide a valid description"),
+        cat: Yup.string().required("Select a valid category")
+    });
 
     return (
-        <main className="min-h-screen bg-[#f8faf9] py-10 px-4">
-            <div className="max-w-xl mx-auto bg-white rounded-3xl shadow-xl shadow-green-900/5 overflow-hidden border border-gray-100">
-                
-                <div className="bg-gradient-to-r from-[#67C090] to-[#468432] p-8 text-white">
-                    <div className="flex items-center gap-3 mb-2">
-                        <FaLeaf className="text-white/90" size={24} />
-                        <h1 className="text-2xl font-extrabold tracking-tight">Create Health Tip</h1>
-                    </div>
-                    <p className="text-green-50/80 text-sm">Fill in the details below to share your medical expertise.</p>
+        <main className="min-h-dvh py-12 px-6">
+            <div className="max-w-2xl mx-auto">
+                {/* Header Text */}
+                <div className="mb-10 text-center">
+                    <h1 className="text-4xl font-black mb-3">
+                        Share a <span style={{ color: Theme.primaryGreen }}>Health Tip</span>
+                    </h1>
+                    <p className="text-slate-500 font-light">
+                        Contribute to the community by sharing reliable medical knowledge.
+                    </p>
                 </div>
 
-                <Formik
-                    initialValues={iv}
-                    validationSchema={valSchema}
-                    onSubmit= async {(values, { setSubmitting, resetForm }) => {
-                        try {
-                            const dbobject = {
-                                ...values,
-                            author: session?.user?.name,
-                            authorImg: session?.user?.image,
-                            refi: session?.user?.id,
-                            timestamp: new Date().toLocaleDateString() // Fixed spelling
-                        }
-                        console.log(dbobject);
+                {/* Form Card */}
+                <div className="bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-slate-100">
+                    <Formik
+                        initialValues={iv}
+                        validationSchema={valSchema}
+                        onSubmit={async (values, { resetForm }) => {
+                            try {
+                                setProcessing(true)
+                                const dbObject = {
+                                    ...values,
+                                    author: session?.user?.name || "Verified Strategist",
+                                    authorImg: session?.user?.image || "",
+                                    refId: session?.user?.id || "anonymous",
+                                    timestamp: new Date().toLocaleDateString()
+                                }
 
-                        const docRef= await addDoc(collection(db, "health-Tips"), dbobject);
-                    }
-                        catch (error) {
-                            console.error("Error creating health tip:", error);
-                        }
-                        console.log(dbobject);
-                        setSubmitting(false);
-                    }}
-                >
-                    {/* 1. Open the function here */}
-                    {({ isSubmitting }) => (
-                        <Form className="p-8 space-y-5">
-                            <div>
-                                <label className={labelClasses}>Health Tip Title</label>
-                                <Field 
-                                    name="tip" 
-                                    placeholder="Enter a catchy health headline..."
-                                    className={inputClasses} 
-                                />
-                                <ErrorMessage component="p" className="text-red-500 text-xs mt-1 font-medium italic" name="tip" />
-                            </div>
+                                await addDoc(collection(db, "health-tips"), dbObject)
+                                resetForm()
+                                handleOpen()
 
-                            <div>
-                                <label className={labelClasses}>Specialty Category</label>
-                                <div className="relative">
-                                    <Field as="select" name="category" className={`${inputClasses} appearance-none cursor-pointer`}>
-                                        <option value="" disabled hidden>Select a specialty...</option>
-                                        <option value="cardio">Cardiology</option>
-                                        <option value="neuro">Neurology</option>
-                                        <option value="ent">ENT (Ear, Nose, Throat)</option>
-                                        <option value="dermal">Dermatology</option>
-                                        <option value="radiography">Radiography</option>
-                                        <option value="dentistry">Dentistry</option>
-                                        <option value="nutrition">Nutrition & Dietetics</option>
-                                        <option value="heamatology">Hematology</option>
-                                    </Field>
-                                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#468432]">
-                                        <svg className="fill-current h-4 w-4" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
-                                    </div>
+                                // console.log(dbObject);
+                            } catch (error) {
+                                console.error("An error occurred", error)
+                                alert("Something went wrong")
+                            } finally {
+                                setProcessing(false)
+                            }
+                        }}
+                    >
+                        {({ errors, touched }) => (
+                            <Form className="flex flex-col gap-8">
+                                {/* Tip Title */}
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-sm font-bold text-slate-700 ml-1">Health Tip Title</label>
+                                    <Field
+                                        name="tip"
+                                        placeholder="e.g. Importance of Vitamin D"
+                                        className={`w-full px-5 py-4 rounded-2xl border transition-all focus:outline-none focus:ring-2 bg-slate-50 ${errors.tip && touched.tip ? 'border-red-400' : 'border-slate-200'
+                                            }`}
+                                        style={{ '--tw-ring-color': Theme.primaryGreen }}
+                                    />
+                                    <ErrorMessage component="p" className="text-red-500 text-xs font-bold ml-1" name="tip" />
                                 </div>
-                                <ErrorMessage component="p" className="text-red-500 text-xs mt-1 font-medium italic" name="category" />
-                            </div>
 
-                            <div>
-                                <label className={labelClasses}>Content / Description</label>
-                                <Field 
-                                    as="textarea" 
-                                    name="description" 
-                                    rows="4"
-                                    placeholder="Explain the health tip in detail..."
-                                    className={`${inputClasses} resize-none`} 
-                                />
-                                <ErrorMessage component="p" className="text-red-500 text-xs mt-1 font-medium italic" name="description" />
-                            </div>
+                                {/* Category Select */}
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-sm font-bold text-slate-700 ml-1">Category</label>
+                                    <div className="relative">
+                                        <Field
+                                            name="cat"
+                                            as="select"
+                                            className="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 bg-slate-50 appearance-none cursor-pointer"
+                                            style={{ '--tw-ring-color': Theme.primaryGreen }}
+                                        >
+                                            <option value="" disabled>Select a category</option>
+                                            <option value="cardio">Cardio</option>
+                                            <option value="neuro">Neuro</option>
+                                            <option value="dermal">Dermal</option>
+                                            <option value="ent">ENT</option>
+                                            <option value="radiography">Radiography</option>
+                                            <option value="dentistry">Dentistry</option>
+                                            <option value="haematology">Haematology</option>
+                                            <option value="other">Other</option>
+                                        </Field>
+                                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-slate-400">
+                                            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
+                                        </div>
+                                    </div>
+                                    <ErrorMessage component="p" className="text-red-500 text-xs font-bold ml-1" name="cat" />
+                                </div>
 
-                            <div className="pt-4">
-                                <button 
+                                {/* Description Textarea */}
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-sm font-bold text-slate-700 ml-1">Content / Description</label>
+                                    <Field
+                                        name="desc"
+                                        as="textarea"
+                                        rows="5"
+                                        placeholder="Provide detailed health information here..."
+                                        className={`w-full px-5 py-4 rounded-2xl border transition-all focus:outline-none focus:ring-2 bg-slate-50 resize-none ${errors.desc && touched.desc ? 'border-red-400' : 'border-slate-200'
+                                            }`}
+                                        style={{ '--tw-ring-color': Theme.primaryGreen }}
+                                    />
+                                    <ErrorMessage component="p" className="text-red-500 text-xs font-bold ml-1" name="desc" />
+                                </div>
+
+                                {/* Submit Button */}
+                                <button
+                                    disabled={processing}
                                     type="submit"
-                                    disabled={isSubmitting}
-                                    style={{ backgroundColor: '#67C090' }}
-                                    className="w-full hover:bg-[#468432] text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 shadow-lg shadow-green-200 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
+                                    className="w-full md:w-max md:self-end flex items-center justify-center gap-3 py-4 px-10 rounded-full text-white font-black text-lg transition-transform active:scale-95 shadow-lg"
+                                    style={{ backgroundColor: Theme.primaryGreen }}
                                 >
-                                    {isSubmitting ? (
-                                        <span className="flex items-center gap-2">
-                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                            Publishing...
+                                    {
+                                        processing ? <FiLoader className="text-2xl animate-spin" /> : <span className="flex items-center gap-2">
+                                            Post Tip <FaRegPaperPlane className="text-sm" />
                                         </span>
-                                    ) : (
-                                        <>
-                                            <span className="uppercase tracking-wider text-sm">Post Health Tip</span>
-                                            <FaRegPaperPlane />
-                                        </>
-                                    )}
+                                    }
+
                                 </button>
-                            </div>
-                        </Form>
-                    )} 
-                    {/* 2. Close the function here */}
-                </Formik> 
-                {/* 3. Close Formik here */}
+                            </Form>
+                        )}
+                    </Formik>
+                </div>
+
+                {/* Back Link */}
+                <p className="text-center mt-10 text-slate-400 text-sm italic">
+                    All submissions are reviewed for community safety.
+                    <button className="ml-2 font-bold underline" style={{ color: Theme.secondaryGreen }}>Learn more</button>
+                </p>
+            </div>
+            <div>
+                {/* <button onClick={handleOpen}>Open modal</button> */}
+                <Modal
+                    open={open}
+                    onClose={handleClose}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                >
+                    <Box sx={style}>
+                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                            <FaRegThumbsUp />
+                        </Typography>
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }} className='text-center'>
+                            Health tip submitted successfully 
+                        </Typography>
+                    </Box>
+                </Modal>
             </div>
         </main>
-    )
+    );
 }

@@ -6,8 +6,8 @@ import Provider from "@/components/Provider";
 
 const playFair = Playfair({
   weight: ["300", "400", "500", "600", "700", "800", "900"],
-  subsets: ["latin"]
-})
+  subsets: ["latin"],
+});
 
 export const metadata = {
   title: "MedShare Africa | connect with health",
@@ -16,15 +16,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html
-      lang="en"
-      className={`${playFair.className} h-full antialiased`}
-    >
+    <html lang="en" className={`${playFair.className} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <Provider>
-          <Navbar/>
+          <Navbar />
           {children}
-          <Footer/>
+          <Footer />
         </Provider>
       </body>
     </html>
